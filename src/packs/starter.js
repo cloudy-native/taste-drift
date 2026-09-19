@@ -38,8 +38,8 @@ export const starter = {
     ],
   },
   rules: [
-    { ifTag: 'outdoor', forbidTags: ['studio'] },
-    { ifTag: 'indoor', forbidTags: ['landscape'] },
+    { ifTag: 'outdoor', forbidTags: ['indoor', 'studio'] },
+    { ifTag: 'indoor', forbidTags: ['outdoor', 'landscape'] },
     { mutex: ['nude', 'clothed'] },
     { mutex: ['solo', 'couple'] },
   ],

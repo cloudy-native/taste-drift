@@ -1,5 +1,7 @@
+import type { Rng } from '../types'
+
 /** mulberry32 — small, deterministic, 32-bit. */
-export function mulberry32(seed) {
+export function mulberry32(seed: number): Rng {
   let a = seed >>> 0
   return function rng() {
     a |= 0
@@ -10,12 +12,12 @@ export function mulberry32(seed) {
   }
 }
 
-export function randomSeed() {
+export function randomSeed(): number {
   const a = crypto.getRandomValues(new Uint32Array(1))[0]
   return a || 1
 }
 
-export function seedFromString(s) {
+export function seedFromString(s: string): number {
   let h = 2166136261
   for (let i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i)

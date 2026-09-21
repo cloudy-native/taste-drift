@@ -6,7 +6,7 @@ See [taste-drift-brief.md](./taste-drift-brief.md).
 
 ## Stack
 
-**Svelte 5 + Vite.** Static SPA. IndexedDB for weights, history, and packs. `localStorage` for UI prefs only.
+**Svelte 5 + Vite + TypeScript.** Static SPA. IndexedDB for weights, history, and packs. `localStorage` for UI prefs only.
 
 ## Run
 
@@ -14,6 +14,8 @@ See [taste-drift-brief.md](./taste-drift-brief.md).
 npm install
 npm run dev
 ```
+
+Typecheck: `npm run check`.
 
 Build: `npm run build` then any static host.
 

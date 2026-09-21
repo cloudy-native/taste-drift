@@ -1,5 +1,5 @@
-<script>
-  let { onConfirm } = $props()
+<script lang="ts">
+  let { onConfirm }: { onConfirm: () => void } = $props()
 </script>
 
 <div class="gate">

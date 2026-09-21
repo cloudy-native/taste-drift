@@ -1,5 +1,17 @@
-<script>
-  let { chips, currentId, onPick, onClose } = $props()
+<script lang="ts">
+  import type { Chip } from '../types'
+
+  let {
+    chips,
+    currentId,
+    onPick,
+    onClose,
+  }: {
+    chips: Chip[]
+    currentId: string
+    onPick: (chip: Chip) => void
+    onClose: () => void
+  } = $props()
 </script>
 
 <div class="overlay" onclick={onClose} role="presentation">

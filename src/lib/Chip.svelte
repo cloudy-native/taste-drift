@@ -1,13 +1,32 @@
-<script>
-  let { item, locked, onLock, onSwap, onEdit, onBan } = $props()
-  let open = $state(false)
+<script lang="ts">
+  import type { SelectedChip } from '../types'
+
+  let {
+    item,
+    locked,
+    open,
+    onToggle,
+    onLock,
+    onSwap,
+    onEdit,
+    onBan,
+  }: {
+    item: SelectedChip
+    locked: boolean
+    open: boolean
+    onToggle: (force?: boolean) => void
+    onLock: () => void
+    onSwap: () => void
+    onEdit: (text: string) => void
+    onBan: () => void
+  } = $props()
   let editing = $state(false)
   let draft = $state('')
 
   function startEdit() {
     draft = item.text
     editing = true
-    open = false
+    onToggle(false)
   }
 
   function commitEdit() {
@@ -17,12 +36,16 @@
   }
 </script>
 
-<div class="wrap">
+<div class="wrap" data-chip>
   <button
     type="button"
     class="chip"
     class:locked
-    onclick={() => (open = !open)}
+    class:open
+    onclick={(e) => {
+      e.stopPropagation()
+      if (!editing) onToggle()
+    }}
   >
     <span class="slot">{item.slot}</span>
     {#if editing}
@@ -34,16 +57,15 @@
     {:else}
       <span class="text">{item.text}</span>
     {/if}
-    {#if locked}<span class="lock" aria-hidden="true">▾</span>{/if}
   </button>
   {#if open}
-    <div class="menu">
-      <button type="button" onclick={() => { onLock(); open = false }}>
+    <div class="menu" role="menu" onpointerdown={(e) => e.stopPropagation()}>
+      <button type="button" onclick={() => { onLock(); onToggle(false) }}>
         {locked ? 'Unlock' : 'Lock'}
       </button>
-      <button type="button" onclick={() => { onSwap(); open = false }}>Swap</button>
+      <button type="button" onclick={() => { onSwap(); onToggle(false) }}>Swap</button>
       <button type="button" onclick={startEdit}>Edit</button>
-      <button type="button" class="danger" onclick={() => { onBan(); open = false }}>Ban</button>
+      <button type="button" class="danger" onclick={() => { onBan(); onToggle(false) }}>Ban</button>
     </div>
   {/if}
 </div>
@@ -67,7 +89,8 @@
     max-width: 100%;
   }
   .chip:hover,
-  .chip.locked {
+  .chip.locked,
+  .chip.open {
     border-color: var(--accent);
   }
   .chip.locked {
@@ -118,8 +141,5 @@
   }
   .danger {
     color: var(--accent) !important;
-  }
-  .lock {
-    display: none;
   }
 </style>

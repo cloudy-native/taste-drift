@@ -7,6 +7,7 @@
   --line: #d9d0c3;
   --accent: #b5442d;
   --accent-dim: #f3e0d8;
+  --cool: #3f6f78;
   --shadow: 0 10px 30px rgba(28, 22, 18, 0.08);
   --serif: 'Iowan Old Style', Palatino, 'Palatino Linotype', 'Times New Roman', serif;
   --sans: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
@@ -102,6 +103,7 @@ select {
     --line: #3a332c;
     --accent: #e07a64;
     --accent-dim: #3a221c;
+    --cool: #8eb8c0;
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
     color-scheme: dark;
   }

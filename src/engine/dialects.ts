@@ -1,6 +1,7 @@
-import { mean } from './sampling.js'
+import type { Dialect, Pack, Selection, WeightMap } from '../types'
+import { mean } from './sampling'
 
-const SLOT_JOIN = {
+const SLOT_JOIN: Record<string, string> = {
   subject: '',
   body: ', ',
   wardrobe: ', ',
@@ -13,9 +14,9 @@ const SLOT_JOIN = {
   extras: ', ',
 }
 
-export function toTag(selected, weights = {}) {
-  const parts = []
-  for (const { slot, text, chip } of Object.values(selected)) {
+export function toTag(selected: Selection, weights: WeightMap = {}): string {
+  const parts: string[] = []
+  for (const { text, chip } of Object.values(selected)) {
     if (!text) continue
     const w = weights[chip.id]
     const m = w ? mean(w) : 0.5
@@ -26,13 +27,12 @@ export function toTag(selected, weights = {}) {
     } else {
       parts.push(text)
     }
-    void slot
   }
   return parts.join(', ')
 }
 
-export function toNatural(selected) {
-  const get = (s) => selected[s]?.text
+export function toNatural(selected: Selection): string {
+  const get = (s: string) => selected[s]?.text
   const subject = get('subject') || 'an adult'
   const body = get('body')
   const wardrobe = get('wardrobe')
@@ -62,12 +62,12 @@ export function toNatural(selected) {
   return s
 }
 
-function cap(t) {
+function cap(t: string): string {
   return t.charAt(0).toUpperCase() + t.slice(1)
 }
 
-export function toNegative(selected, pack) {
-  const tags = new Set()
+export function toNegative(selected: Selection, pack: Pack): string {
+  const tags = new Set<string>()
   for (const item of Object.values(selected)) {
     for (const t of item.chip.tags || []) tags.add(t)
   }
@@ -78,7 +78,12 @@ export function toNegative(selected, pack) {
   return table.default || 'low quality, blurry, watermark, text, extra limbs, deformed'
 }
 
-export function exportPrompt(dialect, selected, pack, weights) {
+export function exportPrompt(
+  dialect: Dialect,
+  selected: Selection,
+  pack: Pack,
+  weights?: WeightMap,
+): string {
   if (dialect === 'natural') return toNatural(selected)
   if (dialect === 'negative') return toNegative(selected, pack)
   return toTag(selected, weights)

@@ -1,3 +1,5 @@
+import type { Pack, Validation } from '../types'
+
 const BANNED = [
   /\b(child|children|kid|kids|toddler|infant|baby|babies)\b/i,
   /\b(teen|teens|teenager|teenagers|underage|minor|minors)\b/i,
@@ -12,7 +14,7 @@ const BANNED = [
 
 const SUBJECT_ADULT = /\b(adult|grown[- ]up)\b/i
 
-function scan(text) {
+function scan(text: string): string | null {
   for (const re of BANNED) {
     const m = text.match(re)
     if (m) return m[0]
@@ -20,22 +22,23 @@ function scan(text) {
   return null
 }
 
-export function validatePack(pack) {
+export function validatePack(pack: unknown): Validation {
   if (!pack || typeof pack !== 'object') {
     return { ok: false, error: 'Pack is not a JSON object.' }
   }
-  if (!pack.pack || typeof pack.pack !== 'string') {
+  const p = pack as Partial<Pack>
+  if (!p.pack || typeof p.pack !== 'string') {
     return { ok: false, error: 'Pack needs a "pack" name.' }
   }
-  if (!pack.slots || typeof pack.slots !== 'object') {
+  if (!p.slots || typeof p.slots !== 'object') {
     return { ok: false, error: 'Pack needs a "slots" object.' }
   }
 
-  const names = Object.keys(pack.slots)
+  const names = Object.keys(p.slots)
   if (!names.length) return { ok: false, error: 'Pack has no slots.' }
 
   for (const slot of names) {
-    const chips = pack.slots[slot]
+    const chips = p.slots[slot]
     if (!Array.isArray(chips)) {
       return { ok: false, error: `Slot "${slot}" is not an array.` }
     }
@@ -43,7 +46,8 @@ export function validatePack(pack) {
       if (!chip?.id || !chip?.text) {
         return { ok: false, error: `A chip in "${slot}" is missing id or text.` }
       }
-      const hit = scan(chip.text) || scan(chip.id) || (chip.tags || []).map(scan).find(Boolean)
+      const hit =
+        scan(chip.text) || scan(chip.id) || (chip.tags || []).map(scan).find(Boolean)
       if (hit) {
         return {
           ok: false,
@@ -59,7 +63,7 @@ export function validatePack(pack) {
     }
   }
 
-  for (const arr of Object.values(pack.fragments || {})) {
+  for (const arr of Object.values(p.fragments || {})) {
     for (const t of arr) {
       const hit = scan(t)
       if (hit) return { ok: false, error: `Rejected: banned term “${hit}” in fragments.` }

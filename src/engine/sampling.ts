@@ -1,11 +1,13 @@
+import type { Beta, Rng } from '../types'
+
 /** Marsaglia–Tsang gamma (shape ≥ 1); boost for shape < 1. */
-function gaussian(rng) {
+function gaussian(rng: Rng): number {
   const u = rng() || 1e-12
   const v = rng() || 1e-12
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)
 }
 
-function gammaSample(shape, rng) {
+function gammaSample(shape: number, rng: Rng): number {
   if (shape < 1) {
     const u = rng() || 1e-12
     return gammaSample(shape + 1, rng) * u ** (1 / shape)
@@ -13,8 +15,8 @@ function gammaSample(shape, rng) {
   const d = shape - 1 / 3
   const c = 1 / Math.sqrt(9 * d)
   for (;;) {
-    let x
-    let v
+    let x: number
+    let v: number
     do {
       x = gaussian(rng)
       v = 1 + c * x
@@ -26,7 +28,7 @@ function gammaSample(shape, rng) {
   }
 }
 
-export function betaSample(a, b, rng) {
+export function betaSample(a: number, b: number, rng: Rng): number {
   const x = gammaSample(Math.max(a, 1e-3), rng)
   const y = gammaSample(Math.max(b, 1e-3), rng)
   const s = x + y
@@ -37,7 +39,12 @@ export function betaSample(a, b, rng) {
  * Pick an index. `drift` 0 = exploit (Thompson), 1 = explore (uniform).
  * Always keeps a small exploration floor so the bandit cannot collapse.
  */
-export function thompsonPick(weights, rng, drift = 0.2, floor = 0.08) {
+export function thompsonPick(
+  weights: Beta[],
+  rng: Rng,
+  drift = 0.2,
+  floor = 0.08,
+): number {
   const n = weights.length
   if (n === 0) return -1
   if (n === 1) return 0
@@ -56,14 +63,14 @@ export function thompsonPick(weights, rng, drift = 0.2, floor = 0.08) {
   return best
 }
 
-export function applyFeedback(w, liked) {
+export function applyFeedback(w: Beta, liked: boolean): Beta {
   return liked ? { a: w.a + 1, b: w.b } : { a: w.a, b: w.b + 1 }
 }
 
-export function prior() {
+export function prior(): Beta {
   return { a: 2, b: 2 }
 }
 
-export function mean(w) {
+export function mean(w: Beta): number {
   return w.a / (w.a + w.b)
 }

@@ -1,5 +1,13 @@
-<script>
-  let { error, onImport, onClose } = $props()
+<script lang="ts">
+  let {
+    error,
+    onImport,
+    onClose,
+  }: {
+    error: string
+    onImport: (raw: string) => void
+    onClose: () => void
+  } = $props()
   let text = $state('')
 </script>
 
@@ -14,7 +22,7 @@
       type="file"
       accept="application/json,.json"
       onchange={async (e) => {
-        const f = e.target.files?.[0]
+        const f = (e.currentTarget as HTMLInputElement).files?.[0]
         if (!f) return
         text = await f.text()
       }}
